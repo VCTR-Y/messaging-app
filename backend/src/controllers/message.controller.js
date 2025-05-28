@@ -23,8 +23,8 @@ export const getMessages = async (req, res) => {
 
     const messages = await Message.find({
       $or: [
-        { sender: myId, receiver: userToChatId },
-        { sender: userToChatId, receiver: myId },
+        { senderId: myId, receiverId: userToChatId },
+        { senderId: userToChatId, receiverId: myId },
       ],
     })
 
@@ -60,7 +60,7 @@ export const sendMessage = async (req, res) => {
 
     // todo: realtime functonality goes here
 
-    res.status(201).json({newMessage});
+    res.status(201).json(newMessage);
     
   } catch (error) {
     console.log("Error in sendMessage: ", error.message);
