@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useChatStore } from "../store/useChatStore";
 import ChatHeader from "./ChatHeader";
 import MessageInput from "./MessageInput";
@@ -10,10 +10,19 @@ const ChatContainer = () => {
   const { messages, getMessages, isMessagesLoading, selectedUser } = useChatStore();
   const { authUser } = useAuthStore();
 
+  // Ref for the bottom of the messages list
+  const messagesEndRef = useRef(null);
 
   useEffect(() => {
     getMessages(selectedUser?._id);
   }, [selectedUser._id, getMessages]);
+
+  // Scroll to bottom when messages change
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView();
+    }
+  }, [messages]);
 
   if (isMessagesLoading) {
     return (
@@ -34,7 +43,7 @@ const ChatContainer = () => {
           <div
             key={message._id}
             className={`chat ${message.senderId === authUser._id ? "chat-end" : "chat-start"}`}>
-              <div className= "chat-image avatar">
+              <div className="chat-image avatar">
                 <div className="size-10 rounded-full border">
                   <img 
                     src={message.senderId === authUser._id 
@@ -64,6 +73,8 @@ const ChatContainer = () => {
               
           </div>
         ))}
+        {/* This div is always at the bottom */}
+        <div ref={messagesEndRef} />
       </div>
 
       <MessageInput />
