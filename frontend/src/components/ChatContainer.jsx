@@ -7,15 +7,18 @@ import { useAuthStore } from "../store/useAuthStore";
 import { formatMessageTime } from "../lib/utils";
 
 const ChatContainer = () => {
-  const { messages, getMessages, isMessagesLoading, selectedUser } = useChatStore();
-  const { authUser } = useAuthStore();
+  const { messages, getMessages, isMessagesLoading, selectedUser, subscribeToMessages, unsubscribeFromMessages } = useChatStore();
+  const { authUser, socket } = useAuthStore();
 
   // Ref for the bottom of the messages list
   const messagesEndRef = useRef(null);
 
   useEffect(() => {
     getMessages(selectedUser?._id);
-  }, [selectedUser._id, getMessages]);
+    subscribeToMessages(socket);
+
+    return () => unsubscribeFromMessages(socket);
+  }, [selectedUser._id, getMessages, subscribeToMessages, unsubscribeFromMessages]);
 
   // Scroll to bottom when messages change
   useEffect(() => {
